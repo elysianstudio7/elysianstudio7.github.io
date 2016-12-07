@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Elysian Studios</title>
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="apple-touch-icon" href="img/favicon.png">
+	<link rel="stylesheet" href="css/main.css" type="text/css" media="all">
+	<link rel="stylesheet" href="fonts/fonts.css" type="text/css" media="all">
+	<script src="js/fp/resizeFontSize.js"></script>
+	<script src="js/three.min.js"></script>
+	<script src="js/masonry.pkgd.min.js"></script>
+	<script src="js/code.min.js"></script>
+	<script id="fragment_shader" type="x-shader/x-fragment">
+		#ifdef GL_ES
+		precision mediump float;
+		#endif
+
+		uniform sampler2D t1a;
+		uniform sampler2D t1b;
+		uniform sampler2D t2a;
+		uniform sampler2D t2b;
+		uniform float blurMixRatio;
+		uniform float mixRatio;
+
+		varying vec2 vUv;
+
+		void main(void) {
+			vec4 mix1;
+			vec4 mix2;
+
+			if (blurMixRatio == 0.0) {
+				mix1 = texture2D(t1a, vUv);
+				mix2 = texture2D(t2a, vUv);
+			} else if (blurMixRatio == 1.0) {
+				mix1 = texture2D(t1b, vUv);
+				mix2 = texture2D(t2b, vUv);
+			} else {
+				mix1 = mix( texture2D(t1a, vUv), texture2D(t1b, vUv), blurMixRatio );
+				mix2 = mix( texture2D(t2a, vUv), texture2D(t2b, vUv), blurMixRatio );
+			}
+
+
+			if (mixRatio == 0.0) {
+				gl_FragColor = mix1;
+			} else if (mixRatio == 1.0) {
+				gl_FragColor = mix2;
+			} else {
+				gl_FragColor = mix( mix1, mix2, mixRatio );
+			}
+
+		}
+	</script>
+	<script id="vertex_shader" type="x-shader/x-vertex">
+		varying vec2 vUv;
+
+		void main() {
+			vUv = uv;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
+		}
+	</script>
+</head>
+<body>
+<div id="scrollArea">
+	<div id="mapContainer">
+		<div id="map"></div>
+	</div>
+</div>
+<div id="stage">
+	<div id="bg"></div>
+	<div class="vignette"></div>
+	<div id="introOverlay" style="opacity: 0.5"></div>
+	<div id="ui">
+		<div id="titles" wrapper="fp.ProjectTitles">
+				<div id="ka" class="project" wrapper="fp.ProjectTitle">
+					<div id="title"><p class='smaller'>Key</p><p class='largest'></p></div>
+					<div id="client" class="info" wrapper="fp.TitleInfo">Elysian Studios</div>
+					<div class="projectContent">
+						<div class="projectNav info" wrapper="fp.TitleInfo">
+							<a class="description" href="?projects/ka/description" wrapper="fp.ProjectNavButton">
+								<span></span>
+								<img class="arrow" src="img/project_nav_arrow.svg"/>
+							</a>
+							<a class="credits" href="?projects/ka/credits" wrapper="fp.ProjectNavButton">
+								<span></span>
+								<img class="arrow" src="img/project_nav_arrow.svg"/>
+							</a>
+						</div>
+						<div class="projectInfo">
+							<div id="description" class="info" wrapper="fp.TitleInfo"><p>Key is a VR experience that takes you into the beautiful Buddhist hill monastery where you experience the life of the little monks at Key monastery. These children from nearby villages are thoughtfully send by their parents to pursue the life of a monk. </p></div>
+						</div>
+					</div>
+				</div>
+				<div id="nps" class="project" wrapper="fp.ProjectTitle">
+					<div id="title"><p class='largest'>Simhasth</p><p class='smaller'></p></div>
+					<div id="client" class="info" wrapper="fp.TitleInfo">Elysian Studio</div>
+					<div class="projectContent">
+						<div class="projectNav info" wrapper="fp.TitleInfo">
+							<a class="description" href="?projects/nps/description" wrapper="fp.ProjectNavButton">
+								<span></span>
+								<img class="arrow" src="img/project_nav_arrow.svg"/>
+							</a>
+							<a class="credits" href="?projects/nps/credits" wrapper="fp.ProjectNavButton">
+								<span></span>
+								<img class="arrow" src="img/project_nav_arrow.svg"/>
+							</a>
+						</div>
+						<div class="projectInfo">
+							<div id="description" class="info" wrapper="fp.TitleInfo"><p>Simhasth - Kumbh Mela | The Journey of a Seeker, is a VR documentary on the Kumbh Mela, one of the largest spiritual gatherings on Earth. It makes you the protagonist and takes you on a journey of a seeker, where you experience the Kumbh Mela and come close to realizing the Truth.</p></div>
+						</div>
+					</div>
+				</div>
+		</div>
+		<div id="sideMenu" wrapper="fp.SideMenu">
+			<div id="cell">
+					<a id="ka" class="sideProject" wrapper="fp.RouterButton" href="?projects/ka">
+						<span id="title">'Key'</span>
+							<span id="circle">
+								<span id="fill"></span>
+							</span>
+					</a>
+					<a id="nps" class="sideProject" wrapper="fp.RouterButton" href="?projects/nps">
+						<span id="title">Simhasth</span>
+							<span id="circle">
+								<span id="fill"></span>
+							</span>
+					</a>
+			</div>
+		</div>
+	</div>
+	<div id="introText" wrapper="tsunami.DisplayObject">
+		<a id="introTextButton" href="" wrapper="fp.RouterButton">
+			<p>Scroll to explore</p>
+			<svg id="arrowDown" class="st0" wrapper="fp.ArrowDown" class="icon" x="0px" y="0px" viewBox="-2 -2 36 36">
+				<line id="line1" x1="23.3" y1="13.1" x2="16.5" y2="19.9"/>
+				<line id="line2" x1="9.7" y1="13.1" x2="16.5" y2="19.9"/>
+			</svg>
+		</a>
+	</div>
+	<div id="info" class="overlay" wrapper="fp.OverlayBranch">
+		<a class="closeOverlay" wrapper="fp.RouterButton" href="?projects"></a>
+		<div id="menu" class="table">
+			<div id="cell" class="content" wrapper="fp.OverlayMenu">
+				<div id="menuItems" wrapper="tsunami.DisplayObject">
+					<a id="about" href="?info/about" wrapper="fp.RouterButton">About</a>
+					<a id="contact" href="?info/contact" wrapper="fp.RouterButton">Contact</a>
+				</div>
+			</div>
+		</div>
+		<div id="contents" class="table">
+			<div id="about" class="content" wrapper="fp.OverlayContentText">
+				<div class="text overlayContent"><p>Elysian is a Virtual Reality Studio based in Bombay</p></div>
+			</div>
+			
+			<div id="contact" class="content" itemscope itemtype="http://schema.org/LocalBusiness" wrapper="fp.Contact">
+				<div class="overlayContent">
+					<div id="address">
+						<p itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+							<span itemprop="streetAddress">350 </span><br/>
+							<span itemprop="addressLocality">Andheri West </span>
+							<span itemprop="addressRegion">Mumbai </span>
+							<span itemprop="postalCode"></span><br/>
+							<span itemprop="addressCountry">India</span>
+						</p>
+						<p>
+							<span itemprop="telephone">+1 514 331-7001</span><br/>
+							<a href="/cdn-cgi/l/email-protection#badfccdfc8c3d5d4dffadcdfd6d3c2dbd4decadbcfd694d9d5d7" itemprop="email" target="_self"><span class="__cf_email__" data-cfemail="2e4b584b5c5741404b6e484b4247564f404a5e4f5b42004d4143">[email&#160;protected]</span><script data-cfhash='f9e31' type="text/javascript">/* <![CDATA[ */!function(t,e,r,n,c,a,p){try{t=document.currentScript||function(){for(t=document.getElementsByTagName('script'),e=t.length;e--;)if(t[e].getAttribute('data-cfhash'))return t[e]}();if(t&&(c=t.previousSibling)){p=t.parentNode;if(a=c.getAttribute('data-cfemail')){for(e='',r='0x'+a.substr(0,2)|0,n=2;a.length-n;n+=2)e+='%'+('0'+('0x'+a.substr(n,2)^r).toString(16)).slice(-2);p.replaceChild(document.createTextNode(decodeURIComponent(e)),c)}p.removeChild(t)}}catch(u){}}()/* ]]> */</script></a>
+							<a href="/cdn-cgi/l/email-protection#6a000508192a0c0f0603120b040e1a0b1f0644090507" itemprop="email" target="_self"><span class="__cf_email__" data-cfemail="92f8fdf0e1d2f4f7fefbeaf3fcf6e2f3e7febcf1fdff">[email&#160;protected]</span><script data-cfhash='f9e31' type="text/javascript">/* <![CDATA[ */!function(t,e,r,n,c,a,p){try{t=document.currentScript||function(){for(t=document.getElementsByTagName('script'),e=t.length;e--;)if(t[e].getAttribute('data-cfhash'))return t[e]}();if(t&&(c=t.previousSibling)){p=t.parentNode;if(a=c.getAttribute('data-cfemail')){for(e='',r='0x'+a.substr(0,2)|0,n=2;a.length-n;n+=2)e+='%'+('0'+('0x'+a.substr(n,2)^r).toString(16)).slice(-2);p.replaceChild(document.createTextNode(decodeURIComponent(e)),c)}p.removeChild(t)}}catch(u){}}()/* ]]> */</script></a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<a id="logo" wrapper="fp.RouterButton tsunami.DisplayObject" href="?projects/intro">
+		<img src="img/logo.png"/>
+	</a>
+	<div id="cinematic" wrapper="tsunami.DisplayObject"><span></span></div>
+	<a id="hamburger" href="?info" wrapper="fp.Hamburger">
+		<svg class="st0" viewBox="-1 -1 35 35" width="32" height="32">
+			<line id="top" x1="0" y1="4" x2="32" y2="4" wrapper="fp.HamburgerLine"/>
+			<g id="middle" wrapper="fp.HamburgerCircle">
+				<path d=""/>
+				<path d=""/>
+				<path d=""/>
+				<path d=""/>
+				<path d=""/>
+				<path d=""/>
+				<path d=""/>
+				<path d=""/>
+				<path d=""/>
+			</g>
+			<line id="bottom" x1="0" y1="28" x2="32" y2="28" wrapper="fp.HamburgerLine"/>
+		</svg>
+	</a>
+	<div class="social">
+		<a href="https://www.facebook.com/studioelysian" target="_blank">
+			<img src="img/share_facebook.svg"/>
+		</a>
+		<a href="https://twitter.com/StudioElysian" target="_blank">
+			<img src="img/share_twitter.svg"/>
+		</a>
+		<a href="https://www.instagram.com/studioelysian/" target="_blank">
+			<img src="img/share_instagram.svg"/>
+		</a>
+	</div>
+	<div class="languageMenu" wrapper="fp.LanguageMenu">
+		<div class="button">
+			<span>en</span>
+			<svg class="arrow st0" class="st0" viewBox="0 0 11 6" width="11" height="6">
+				<line id="line1" x1="0" y1="0" x2="5.5" y2="6"/>
+				<line id="line2" x1="5.5" y1="6" x2="11" y2="0"/>
+			</svg>
+		</div>
+		<div class="other">
+			<div class="list" wrapper="tsunami.DisplayObject">
+					<a href="./fr.php">fr</a>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	main = new fp.Main();
+	main.init();
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?language=en&key=AIzaSyDSHp72kIM8U2pFjttB0uV_Zcuv6TubVuc"></script>
+<script>
+	main.createMap();
+</script>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script></body>
+</html>
+sw
